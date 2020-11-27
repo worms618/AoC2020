@@ -6,9 +6,9 @@ import {
   createDayPartOneFilePath,
   createDayPartTwoFilePath,
   writeTextFileSync
-} from "../../src/utils.ts";
+} from "../utils.ts";
 
-export class DayFolder {
+export class DayFolderModel {
   private folderPath: Path;
   private inputFolderPath: Path;
   private partOneFilePath: Path;

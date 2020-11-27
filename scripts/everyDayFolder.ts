@@ -1,16 +1,14 @@
-import { DayFolder } from "./folderBuilder.model.ts";
+import { DayFolderModel } from "../src/dayFolder/model.ts";
 
-import { daysFolder } from "../../src/consts.ts";
+import { daysFolder } from "../src/consts.ts";
 
-import { createFolderInRoot } from "../../src/utils.ts";
+import { createFolderInRoot } from "../src/utils.ts";
 
-// ------- Constants -------
-
+// ------- Parameters -------
 const daysFolderPath = createFolderInRoot(daysFolder);
 
 const startDate = new Date(2020, 11);
-// const endDate = new Date(2020, 11, 24);
-const endDate = new Date(2020, 11, 1);
+const endDate = new Date(2020, 11, 24);
 
 // ------- Script -------
 
@@ -20,7 +18,7 @@ if (!daysFolderPath.exists)
 let nextDate = startDate;
 while (nextDate <= endDate) {
   const dayOfMonth = nextDate.getDate();
-  const dayFolder = new DayFolder(dayOfMonth);
+  const dayFolder = new DayFolderModel(dayOfMonth);
 
   dayFolder.mkSync('');
   
