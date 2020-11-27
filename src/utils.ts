@@ -1,7 +1,9 @@
 import {Path, WINDOWS_SEPS} from "https://deno.land/x/path/mod.ts";
 
 import { 
-  daysFolder
+  daysFolder,
+  templatesFolder,
+  templateDayPartFileName
 } from "./consts.ts";
 
 const rootFolder = Deno.cwd();
@@ -20,6 +22,10 @@ export const createFolderInDayFolder = (dayNumber: number, folderName: string): 
 
 export const createDayPartScriptFilePath = (dayFolderPath: Path, partNumber: number): Path => combineFolders(dayFolderPath.toString(), createPartScriptFileName(partNumber));
 export const createDayPartInputFilePath = (dayFolderPath: Path, partNumber: number): Path => combineFolders(dayFolderPath.toString(), createPartInputFileName(partNumber));
+
+export const createInTemplateFolder = (value: string): Path => new Path(`${templatesFolder}/${value}`, WINDOWS_SEPS);
+
+export const getTemplateDayPartFilePath = (): Path => createInTemplateFolder(templateDayPartFileName);
 
 export const writeTextFileSync = (path: Path, data: string, options?: Deno.WriteFileOptions): void => {
   Deno.writeTextFileSync(path.toString(), data, options);
