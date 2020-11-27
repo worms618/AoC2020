@@ -1,45 +1,27 @@
 import { Path } from "https://deno.land/x/path/mod.ts";
 
 import {
-  createDayFolder,
-  createInputFolderInDayFolder,
-  createDayPartOneFilePath,
-  createDayPartTwoFilePath,
-  writeTextFileSync
+  createDayFolder
 } from "../utils.ts";
+
+import { DayPartFiles } from "./part.model.ts";
 
 export class DayFolderModel {
   private folderPath: Path;
-  private inputFolderPath: Path;
-  private partOneFilePath: Path;
-  private partTwoFilePath: Path;
+  private partOneFiles: DayPartFiles;
+  private partTwoFiles: DayPartFiles;
 
   constructor(private dayOfMonth: number) {
     this.folderPath = createDayFolder(this.dayOfMonth);
-    this.inputFolderPath = createInputFolderInDayFolder(this.dayOfMonth);
-    this.partOneFilePath = createDayPartOneFilePath(this.dayOfMonth);
-    this.partTwoFilePath = createDayPartTwoFilePath(this.dayOfMonth);
+    this.partOneFiles = new DayPartFiles(this.folderPath, 1);
+    this.partTwoFiles = new DayPartFiles(this.folderPath, 2);
   }
 
   mkSync(partTemplateContent: string): void {
     if (!this.folderPath.exists)
       this.folderPath.mkDirSync();
-    
-    if (!this.inputFolderPath.exists)
-      this.inputFolderPath.mkDirSync();
 
-    if (!this.partOneFilePath.exists) {
-      writeTextFileSync(this.partOneFilePath, partTemplateContent, {
-        append: false,
-        create: true
-      });  
-    }
-
-    if (!this.partTwoFilePath.exists) {
-      writeTextFileSync(this.partTwoFilePath, partTemplateContent, {
-        append: false,
-        create: true
-      });  
-    }
+    this.partOneFiles.mkSync(partTemplateContent, '');
+    this.partTwoFiles.mkSync(partTemplateContent, '');
   }
 }
