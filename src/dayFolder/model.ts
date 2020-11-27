@@ -17,11 +17,23 @@ export class DayFolderModel {
     this.partTwoFiles = new DayPartFiles(this.folderPath, 2);
   }
 
+  public get PartOneFiles(): DayPartFiles {
+    return this.partOneFiles;
+  }
+
+  public get PartTwoFiles(): DayPartFiles {
+    return this.partTwoFiles;
+  }
+
   mkSync(partTemplateContent: string): void {
     if (!this.folderPath.exists)
       this.folderPath.mkDirSync();
 
     this.partOneFiles.mkSync(partTemplateContent, '');
     this.partTwoFiles.mkSync(partTemplateContent, '');
+  }
+
+  exists(): boolean {
+    return this.folderPath.exists;
   }
 }

@@ -15,6 +15,14 @@ export class DayPartFiles {
     this.inputFilePath = createDayPartInputFilePath(this.rootFolderPath, this.partNumber);
   }
 
+  public get ScriptFilePath(): Path {
+    return this.scriptFilePath;
+  }
+  
+  public get InputFilePath(): Path {
+    return this.inputFilePath;
+  }
+
   mkSync(scriptContentTemplate: string, inputContentTemplate: string): void {
     if (!this.scriptFilePath.exists) {
       writeTextFileSync(this.scriptFilePath, scriptContentTemplate, {
