@@ -4,6 +4,8 @@ const rootFolder = Deno.cwd();
 
 const inputFolderName = 'input';
 
+const runSolutionFile = 'index.ts';
+
 const startDate = new Date(2020, 11);
 const endDate = new Date(2020, 11, 24);
 let nextDate = startDate;
@@ -13,9 +15,11 @@ const createFolderPath = (folderName: string) => new Path(rootFolder + '/' + fol
 
 while (nextDate <= endDate) {
   const dayOfMonth = nextDate.getDate();
+  
   const folderName = createFolderName(dayOfMonth);
   const folderPath = createFolderPath(folderName);
-  const inputFolderPath = new Path(`${folderPath.toString()}/${inputFolderName}`, WINDOWS_SEPS)
+  
+  const inputFolderPath = new Path(`${folderPath.toString()}/${inputFolderName}`, WINDOWS_SEPS);
 
   if (!folderPath.exists) 
     folderPath.mkDirSync();
