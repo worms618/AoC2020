@@ -1,1 +1,0 @@
-deno run --allow-read --allow-write .\_main\folderBuilder.ts

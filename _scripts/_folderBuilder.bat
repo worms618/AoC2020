@@ -1,0 +1,1 @@
+deno run --allow-read --allow-write .\scripts\folderBuilder\index.ts
