@@ -1,4 +1,4 @@
-import { dayScripts } from "../../src/dayFolder/types.ts";
+import { dayScripts } from "../../src/day.types.ts";
 
 import { executor as part1Executor } from "./part1.ts";
 import { executor as part2Executor } from "./part2.ts";
