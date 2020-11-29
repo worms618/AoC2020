@@ -1,38 +1,43 @@
-import { Path, WINDOWS_SEPS } from "https://deno.land/x/path/mod.ts";
-
-const rootFolder = Deno.cwd();
-
-export const writeTextFileSync = (path: Path, data: string, options?: Deno.WriteFileOptions): void => {
-  Deno.writeTextFileSync(path.toString(), data, options);
-};
-
-export const readTextFileSync = (path: Path): string => {
-  return Deno.readTextFileSync(path.toString());
-}
-
-export const readDirSync = (path: Path): Iterable<Deno.DirEntry> => {
-  return Deno.readDirSync(path.toString());
-}
-
-export const copyFileSync = (fromPath: Path, toPath: Path): void => {
-  Deno.copyFileSync(fromPath.toString(), toPath.toString());
-}
-
-export const deepCopyDirectory = (fromDir: string | URL, toDir: string | URL): void => {
+/**
+ * 
+ * requires: --allow-read, --allow-write flags
+ */
+export const DeepCopyDirectory = (fromDir: string | URL, toDir: string | URL): void => {
   for (const dirEntry of Deno.readDirSync(fromDir)) {
     const entryFromURL = new URL(dirEntry.name, fromDir);
     const entryToURL = new URL(dirEntry.name, toDir);
 
     if (dirEntry.isFile) {
       // Providing "entryFromURL" and "entryToURL" as argument throws error => TypeError: Must be a file URL
-      Deno.copyFileSync(entryFromURL.pathname, entryToURL.pathname);
+      Deno.copyFileSync(entryFromURL.href, entryToURL.href);
     } else if (dirEntry.isDirectory) {
       Deno.mkdirSync(entryToURL);
-      deepCopyDirectory(entryFromURL, entryToURL);
+      DeepCopyDirectory(entryFromURL, entryToURL);
     }
   }
 }
 
-export const combineToPath = (baseFolder: string, folder: string): Path => new Path(`${baseFolder}/${folder}`, WINDOWS_SEPS);
+/**
+ * Checks if the path exists
+ * ```ts
+ * const path = new Path("/home/test/text.txt");
+ * path.exists;
+ * ```
+ * requires: --allow-read flag
+ */
+export const FileOrDirExists = (path: string | URL): boolean => {
+  try {
+    Deno.statSync(path);
+    return true;
+  } catch (e) {
+    // do not hide permission errors from the user
+    if (e instanceof Deno.errors.PermissionDenied) {
+      throw e;
+    }
+    return false;
+  }
+}
 
-export const createFolderPathInRootFolder = (folderName: string): Path => combineToPath(rootFolder, folderName);
+const rootFolder = Deno.cwd();
+const rootFolderURL = new URL(rootFolder + '/');
+export const CreatePathURLWithBaseRootFolder = (path: string): URL => new URL(path, rootFolderURL);

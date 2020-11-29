@@ -1,57 +1,51 @@
-import { Path } from "https://deno.land/x/path/mod.ts";
-
-import { 
+import {
   DaysFolderName,
-  DaysFolderTemplateName
+  DaysFolderTemplateName,
+  DayFolderTemplateName
 } from "../src/consts.ts";
 
-import { 
-  createFolderPathInRootFolder,
-  combineToPath,
-  deepCopyDirectory,
-  copyFileSync
+import {
+  CreatePathURLWithBaseRootFolder,
+  DeepCopyDirectory,
+  FileOrDirExists
 } from "../src/utils.ts";
 
 // ------- Utils -------
 
-const createDayFolderName = (dayOfMonth: number) => `Day-${dayOfMonth}`;
-const createDayFolderPath = (daysFolderPath: Path, dayNumber: number): Path => combineToPath(daysFolderPath.toString(), createDayFolderName(dayNumber));
+const createDayFolderName = (dayOfMonth: number) => `Day-${dayOfMonth}/`;
+const createDayFolderURL = (daysFolderURL: URL, dayNumber: number): URL => new URL(createDayFolderName(dayNumber), daysFolderURL);
 
 // ------- Parameters -------
 
-const daysFolderPath = createFolderPathInRootFolder(DaysFolderName);
-const dayScriptsFilePath = combineToPath(daysFolderPath.toString(), 'dayScripts.ts');
+const daysFolderURL = CreatePathURLWithBaseRootFolder(DaysFolderName);
+const dayScriptsFileURL = new URL('dayScripts.ts', daysFolderURL);
 
-const daysFolderTemplateFolderPath = createFolderPathInRootFolder(DaysFolderTemplateName);
-const dayFolderTemplatePath = combineToPath(daysFolderTemplateFolderPath.toString(), 'day');
+const daysTemplateFolderURL = CreatePathURLWithBaseRootFolder(DaysFolderTemplateName);
+const dayTemplateFolderURL = new URL(DayFolderTemplateName, daysTemplateFolderURL);
 
 const startDate = new Date(2020, 11);
 const endDate = new Date(2020, 11, 24);
 
 // ------- Script -------
 
-if (!daysFolderPath.exists)
-  daysFolderPath.mkDirSync();
+if (!FileOrDirExists(daysFolderURL.href))
+  Deno.mkdirSync(daysFolderURL.href);
 
-if (!dayScriptsFilePath.exists) {
-  const dayScriptsTemplateFilePath = combineToPath(daysFolderTemplateFolderPath.toString(), 'dayScripts.ts');
-  copyFileSync(dayScriptsTemplateFilePath, dayScriptsFilePath);
+if (!FileOrDirExists(dayScriptsFileURL.href)) {
+  const dayScriptsTemplateFileURL = new URL('dayScripts.ts', daysTemplateFolderURL);
+  Deno.copyFileSync(dayScriptsTemplateFileURL.href, dayScriptsFileURL.href);
 }
 
 let nextDate = startDate;
 while (nextDate <= endDate) {
   const dayOfMonth = nextDate.getDate();
 
-  const dayFolderPath = createDayFolderPath(daysFolderPath, dayOfMonth);
+  const dayFolderURL = createDayFolderURL(daysFolderURL, dayOfMonth);
 
-  if (!dayFolderPath.exists)
-    dayFolderPath.mkDirSync();
-  
-  // Instance of Path does not return separator at last entry
-  deepCopyDirectory(
-    dayFolderTemplatePath.toString() + dayFolderTemplatePath.separatorList[0], 
-    dayFolderPath.toString() + dayFolderTemplatePath.separatorList[0]
-  );
-  
+  if (!FileOrDirExists(dayFolderURL.href)) {
+    Deno.mkdirSync(dayFolderURL.href);
+    DeepCopyDirectory(dayTemplateFolderURL.href, dayFolderURL.href);
+  }
+
   nextDate.setDate(nextDate.getDate() + 1);
 };
