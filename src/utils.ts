@@ -24,6 +24,7 @@ export const deepCopyDirectory = (fromDir: string | URL, toDir: string | URL): v
     const entryToURL = new URL(dirEntry.name, toDir);
 
     if (dirEntry.isFile) {
+      // Providing "entryFromURL" and "entryToURL" as argument throws error => TypeError: Must be a file URL
       Deno.copyFileSync(entryFromURL.pathname, entryToURL.pathname);
     } else if (dirEntry.isDirectory) {
       Deno.mkdirSync(entryToURL);
