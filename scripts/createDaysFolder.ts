@@ -8,7 +8,7 @@ import {
 import { 
   createFolderPathInRootFolder,
   combineToPath,
-  readDirSync,
+  deepCopyDirectory,
   copyFileSync
 } from "../src/utils.ts";
 
@@ -47,14 +47,11 @@ while (nextDate <= endDate) {
   if (!dayFolderPath.exists)
     dayFolderPath.mkDirSync();
   
-  for (const templateDirEntry of readDirSync(dayFolderTemplatePath)) {
-    const dayDirEntryPath = combineToPath(dayFolderPath.toString(), templateDirEntry.name);
-    
-    if (!dayDirEntryPath.exists) {
-      const templatedireEntryPath = combineToPath(dayFolderTemplatePath.toString(), templateDirEntry.name);
-      copyFileSync(templatedireEntryPath, dayDirEntryPath);
-    }
-  }  
+  // Instance of Path does not return separator at last entry
+  deepCopyDirectory(
+    dayFolderTemplatePath.toString() + dayFolderTemplatePath.separatorList[0], 
+    dayFolderPath.toString() + dayFolderTemplatePath.separatorList[0]
+  );
   
   nextDate.setDate(nextDate.getDate() + 1);
 };
