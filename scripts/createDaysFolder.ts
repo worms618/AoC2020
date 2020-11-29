@@ -10,10 +10,12 @@ import {
   FileOrDirExists
 } from "../src/utils.ts";
 
-// ------- Utils -------
+import { 
+  createDayFolderURL, 
+  createDayFolderName 
+} from "../src/day.utils.ts";
 
-const createDayFolderName = (dayOfMonth: number) => `Day-${dayOfMonth}/`;
-const createDayFolderURL = (daysFolderURL: URL, dayNumber: number): URL => new URL(createDayFolderName(dayNumber), daysFolderURL);
+// ------- Utils -------
 
 const createDayScriptsImportAlias = (dayOfMonth: number) => `day${dayOfMonth}`;
 const createImportDayScriptsStatement = (dayOfMonth: number) => `import { scripts as ${createDayScriptsImportAlias(dayOfMonth)} } from "./${createDayFolderName(dayOfMonth)}mod.ts";`;

@@ -1,8 +1,8 @@
-import { dayScripts } from "../src/day.types.ts";
+import { DayScripts } from "../src/day.types.ts";
 
-const scriptsPerDayNumber = new Map<number, dayScripts>();
+const scriptsPerDayNumber = new Map<number, DayScripts>();
 
-export const getScriptsForDay = (day: number): dayScripts => {
+export const getScriptsForDay = (day: number): DayScripts => {
   const scripts = scriptsPerDayNumber.get(day);
 
   if (scripts)

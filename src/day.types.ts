@@ -1,5 +1,5 @@
-export type dayScriptExecutor = (input: string) => string;
-export type dayScripts = {
-  part1: dayScriptExecutor,
-  part2: dayScriptExecutor
+export type DayScriptExecutor = (input: string) => string;
+export type DayScripts = {
+  part1: DayScriptExecutor,
+  part2: DayScriptExecutor
 };
