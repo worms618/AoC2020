@@ -1,5 +1,4 @@
 import {
-  DaysFolderName,
   DaysFolderTemplateName,
   DayFolderTemplateName
 } from "../src/consts.ts";
