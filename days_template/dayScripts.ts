@@ -1,4 +1,4 @@
-import { DayScripts } from "../src/day.types.ts";
+import { DayScripts } from "../src/day/day.types.ts";
 
 const scriptsPerDayNumber = new Map<number, DayScripts>();
 

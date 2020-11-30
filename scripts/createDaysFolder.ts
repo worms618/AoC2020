@@ -13,7 +13,7 @@ import {
 import { 
   createDayFolderURL, 
   createDayFolderName 
-} from "../src/day.utils.ts";
+} from "../src/day/day.utils.ts";
 
 // ------- Utils -------
 
