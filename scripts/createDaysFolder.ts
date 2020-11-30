@@ -10,9 +10,10 @@ import {
   FileOrDirExists
 } from "../src/utils.ts";
 
-import { 
-  createDayFolderURL, 
-  createDayFolderName 
+import {
+  createDaysFolderURL,
+  createDayFolderURL,
+  createDayFolderName
 } from "../src/day/day.utils.ts";
 
 // ------- Utils -------
@@ -27,7 +28,7 @@ type ImportAndSetInMapStatements = { importStatements: string[], setInMapStateme
 
 // ------- Consts -------
 
-const daysFolderURL = CreatePathURLWithBaseRootFolder(DaysFolderName);
+const daysFolderURL = createDaysFolderURL();
 const dayScriptsFileURL = new URL('dayScripts.ts', daysFolderURL);
 
 const daysTemplateFolderURL = CreatePathURLWithBaseRootFolder(DaysFolderTemplateName);
@@ -67,7 +68,7 @@ while (nextDate <= endDate) {
 
 // ------- Create import and set in map section content -------
 
-const importAndInsertLines: ImportAndSetInMapStatements = 
+const importAndInsertLines: ImportAndSetInMapStatements =
   usedDaysOfMonth.reduce<ImportAndSetInMapStatements>((acc, dayOfMonth) => {
     acc.importStatements.push(createImportDayScriptsStatement(dayOfMonth));
     acc.setInMapStatements.push(createSetDayScriptsInMapStatement(dayOfMonth));
@@ -93,7 +94,7 @@ const importAndSetStatementsSectionContent = importAndSetStatementsSectionLines.
 
 if (!FileOrDirExists(dayScriptsFileURL.href)) {
   const dayScriptsTemplateFileURL = new URL('dayScripts.ts', daysTemplateFolderURL);
-  Deno.copyFileSync(dayScriptsTemplateFileURL.href, dayScriptsFileURL.href);  
+  Deno.copyFileSync(dayScriptsTemplateFileURL.href, dayScriptsFileURL.href);
 }
 
 const dayScriptsContent = Deno.readTextFileSync(dayScriptsFileURL.href);

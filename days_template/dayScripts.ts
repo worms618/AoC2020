@@ -10,3 +10,7 @@ export const getScriptsForDay = (day: number): DayScripts => {
   else
     throw new Error(`No scripts found for day ${day}`);
 };
+
+export const hasScriptsForDay = (day: number): boolean => {
+  return scriptsPerDayNumber.has(day);
+};
