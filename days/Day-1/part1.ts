@@ -1,41 +1,18 @@
 import { DayScriptExecutor } from "../../src/day/day.types.ts";
 
-class AdditionSumValues {
-  constructor(public value1: number = -1, public value2: number = -1) {
-  }
-
-  sum(): number {
-    return this.value1 + this.value2;
-  }
-
-  multiply(): number {
-    return this.value1 * this.value2;
-  }
-
-  toString(): string {
-    return [
-      `${this.value1} + ${this.value2} = ${this.sum()};`,
-      `${this.value1} * ${this.value2} = ${this.multiply()};`
-    ].join('\n');
-  };
-}
+import { AdditionSumTwoValues } from "./AdditionSumValues.ts";
+import { ParseInputSorted, ParseResult, AdditionSum } from "./shared.ts";
 
 export const executor: DayScriptExecutor = (input: string): string => {
-  const inputValues: number[] = input
-    .split('\n')
-    .map(value => value.trim())
-    .map(value => parseInt(value, 10))
-    .sort();
+  const inputValues: number[] = ParseInputSorted(input);
 
-  const additionSum = 2020;
-
-  const multipleResults = solutionBruteForceAllOccurances(inputValues, additionSum);
-  return multipleResults.map((result, index) => `Solution ${index+1}:\n${result.toString()}`).join('\n');    
+  const multipleResults = solutionBruteForceAllOccurances(inputValues, AdditionSum);
+  return ParseResult(multipleResults);
 };
 
-const solutionBruteForceAllOccurances = (values: number[], sumTotal: number): AdditionSumValues[] => {
+const solutionBruteForceAllOccurances = (values: number[], sumTotal: number): AdditionSumTwoValues[] => {
   const occurances = [];
-  let addSumValuesOccurance = new AdditionSumValues();
+  let addSumValuesOccurance = new AdditionSumTwoValues();
 
   for (let i = 0; i < values.length; i++) {
     addSumValuesOccurance.value1 = values[i];
@@ -46,7 +23,7 @@ const solutionBruteForceAllOccurances = (values: number[], sumTotal: number): Ad
       if (addSumValuesOccurance.sum() === sumTotal) {
         occurances.push(addSumValuesOccurance);
 
-        addSumValuesOccurance = new AdditionSumValues(
+        addSumValuesOccurance = new AdditionSumTwoValues(
           addSumValuesOccurance.value1,
           addSumValuesOccurance.value2
         );
