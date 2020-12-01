@@ -20,7 +20,7 @@ export function RunDayAndPart(day: number,  part: number) {
 export function ExecutePartForDay(day: number,  partNumber: number): string {
   const dayFolder = createDayFolderURL(createDaysFolderURL(), day);
   
-  if (!FileOrDirExists(dayFolder))
+  if (!FileOrDirExists(dayFolder.href))
     throw new Error(`No folder found for day: [${day.toString()}] at url: [${dayFolder.href}]`);
 
   if (!hasScriptsForDay(day))
@@ -45,8 +45,8 @@ function executePartForDay(scripts: DayScripts, partNumber: number, dayFolderURL
 function getPartInputContent(partNumber: number, dayFolderURL: URL): string {
   const partInputFileURL = createDayInputFileURL(dayFolderURL, partNumber);
 
-  if (!FileOrDirExists(partInputFileURL))
+  if (!FileOrDirExists(partInputFileURL.href))
     throw new Error(`No input file found for part: [${partNumber.toString()}] at url: [${partInputFileURL.href}]`);
   
-  return Deno.readTextFileSync(partInputFileURL);
+  return Deno.readTextFileSync(partInputFileURL.href);
 }
