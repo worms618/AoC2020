@@ -28,25 +28,34 @@ export const executor: DayScriptExecutor = (input: string): string => {
     .sort();
 
   const additionSum = 2020;
-  const values = solutionBruteForceFirstOccurance(inputValues, additionSum);
 
-  return values.toString();
+  const multipleResults = solutionBruteForceAllOccurances(inputValues, additionSum);
+  return multipleResults.map((result, index) => `Solution ${index+1}:\n${result.toString()}`).join('\n');    
 };
 
-const solutionBruteForceFirstOccurance = (values: number[], sumTotal: number): AdditionSumValues => {
-  const additionSumValues = new AdditionSumValues();
+const solutionBruteForceAllOccurances = (values: number[], sumTotal: number): AdditionSumValues[] => {
+  const occurances = [];
+  let addSumValuesOccurance = new AdditionSumValues();
 
   for (let i = 0; i < values.length; i++) {
-    additionSumValues.value1 = values[i];
+    addSumValuesOccurance.value1 = values[i];
 
     for (let j = 0; j < values.length; j++) {
-      additionSumValues.value2 = values[j];
+      addSumValuesOccurance.value2 = values[j];
 
-      if (additionSumValues.sum() === sumTotal) {
-        return additionSumValues;
+      if (addSumValuesOccurance.sum() === sumTotal) {
+        occurances.push(addSumValuesOccurance);
+
+        addSumValuesOccurance = new AdditionSumValues(
+          addSumValuesOccurance.value1,
+          addSumValuesOccurance.value2
+        );
       }
     }
   }
 
-  throw new Error(`No two values found in argument values, which sum to argument sumTotal: ${sumTotal}`)
+  if (occurances.length === 0)
+    throw new Error(`Not one of two values found in argument values, which sum to argument sumTotal: ${sumTotal}`)
+  else
+    return occurances;
 };
