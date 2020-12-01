@@ -14,3 +14,8 @@ export const getScriptsForDay = (day: number): DayScripts => {
 export const hasScriptsForDay = (day: number): boolean => {
   return scriptsPerDayNumber.has(day);
 };
+// ------- Import and set in map statements for scripts of day -------
+
+import { scripts as day1 } from "./Day-1/mod.ts";
+
+scriptsPerDayNumber.set(1, day1);
