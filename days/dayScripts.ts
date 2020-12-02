@@ -17,5 +17,7 @@ export const hasScriptsForDay = (day: number): boolean => {
 // ------- Import and set in map statements for scripts of day -------
 
 import { scripts as day1 } from "./Day-1/mod.ts";
+import { scripts as day2 } from "./Day-2/mod.ts";
 
 scriptsPerDayNumber.set(1, day1);
+scriptsPerDayNumber.set(2, day2);
