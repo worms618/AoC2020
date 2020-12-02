@@ -45,10 +45,10 @@ const validatePasswordOverPolicy = (policyAndPassword: PolicyAndPassword): boole
   let totalAppearanceOfChar = 0;
 
   for (const pwChar of policyAndPassword.password) {
-    (pwChar === char) ? totalAppearanceOfChar++ : {};
-
-    if (totalAppearanceOfChar > max)
-      return false;
+    if (pwChar === char) {
+      totalAppearanceOfChar++;
+      if (totalAppearanceOfChar > max) return false;
+    }
   }
 
   return (totalAppearanceOfChar >= min) && (totalAppearanceOfChar <= max);
