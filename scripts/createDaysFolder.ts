@@ -35,7 +35,7 @@ const dayTemplateFolderURL = new URL(DayFolderTemplateName, daysTemplateFolderUR
 
 const startDate = new Date(2020, 11);
 // const endDate = new Date(2020, 11, 24);
-const endDate = new Date(2020, 11, 2);
+const endDate = new Date(2020, 11, new Date(Date.now()).getDate());
 
 const importAndSetInMapStatementsSectionHeader = '// ------- Import and set in map statements for scripts of day -------';
 
