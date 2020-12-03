@@ -21,3 +21,31 @@ export const getTreeMap = (input: string): TreeMap => {
     .filter(line => line)
     .map(line => line.split('').map(char => char.trim()));
 };
+
+export const calcHitOfTree = (startPoint: Point2D, slope: Point2D, treeMap: TreeMap): number => {
+  const heightTreeMap = treeMap.length;
+  const widthTreeMap = treeMap[0].length;
+  const nextPos = startPoint.copy()
+  let treesHit = 0;
+  
+  while (true) {
+    if (nextPos.y > heightTreeMap) break;
+
+    if (nextPos.x > widthTreeMap) {
+      treesHit += calcHitOfTree(
+        new Point2D((nextPos.x - widthTreeMap), nextPos.y),
+        slope,
+        treeMap
+      );
+      break;
+    }
+    else {
+      const charAtNextPos = treeMap[nextPos.y - 1][nextPos.x - 1];
+      charAtNextPos === TreeChar ? treesHit++ : {};
+    }
+
+    nextPos.add(slope);
+  }
+
+  return treesHit;
+};
