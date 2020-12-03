@@ -1,33 +1,40 @@
-export type Policy = {
-  min: number,
-  max: number,
-  char: string
-}
+export type ParsedInput = {
+  min: number;
+  max: number;
+  char: string;
+  password: string;
+};
 
-export type PolicyAndPassword = {
-  policy: Policy,
-  password: string
-}
-
-
-export const getPolicyAndPasswordOfLine = (line: string): PolicyAndPassword => {
-  const details = line.split(':').map(value => value.trim());
+export const getBySplitting = (line: string): ParsedInput => {
+  const splitPolicyAndPassword = line.split(':').map(value => value.trim());
+  const policyDetails = splitPolicyAndPassword[0].split(' ').map(value => value.trim());
+  const minAndMax = policyDetails[0].split('-').map(value => parseInt(value.trim()));
 
   return {
-    policy: getPolicy(details[0]),
-    password: details[1]
-  }
+    min: minAndMax[0],
+    max: minAndMax[1],
+    char: policyDetails[1],
+    password: splitPolicyAndPassword[1]
+  };
 }
 
-export const getPolicy = (value: string): Policy => {
-  const details = value.split(' ').map(value => value.trim());
+export const getByRegExp = (line: string): ParsedInput => {
+  const parsedInputRegex: RegExp = /(\d+)-(\d+)\s*([a-z])\s*:\s*([a-z]+)/gm;
+  const minimumResults = 5;
 
-  const constraints = details[0].split('-').map(value => parseInt(value.trim()));
-  const char = details[1];
+  const regResults = parsedInputRegex.exec(line);
 
-  return {
-    min: constraints[0],
-    max: constraints[1],
-    char
+  if (regResults) {
+    if (regResults.length < minimumResults)
+      throw new Error(`No enough results ([${regResults.length}] should be atleast ${minimumResults}) found for argument line ${line}`);
+
+    return {
+      min: parseInt(regResults[1], 10),
+      max: parseInt(regResults[2], 10),
+      char: regResults[3],
+      password: regResults[4]
+    }
+  } else {
+    throw new Error(`Invalid syntax for argument line ${line}`);
   }
-}
+};
