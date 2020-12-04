@@ -19,7 +19,9 @@ export const hasScriptsForDay = (day: number): boolean => {
 import { scripts as day1 } from "./Day-1/mod.ts";
 import { scripts as day2 } from "./Day-2/mod.ts";
 import { scripts as day3 } from "./Day-3/mod.ts";
+import { scripts as day4 } from "./Day-4/mod.ts";
 
 scriptsPerDayNumber.set(1, day1);
 scriptsPerDayNumber.set(2, day2);
 scriptsPerDayNumber.set(3, day3);
+scriptsPerDayNumber.set(4, day4);
