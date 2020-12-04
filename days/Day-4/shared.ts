@@ -1,92 +1,9 @@
-const getFieldWithValueRegExp: RegExp = /(.*)\s*:\s*(.*)/;
+const requiredFields: string[] = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid'];
 
 type FieldWithValue = {
   field: string,
   value: string
 };
-
-const valueInRange = (value: number, min: number, max: number): boolean => {
-  return (value >= min) && (value <= max);
-}
-
-const fourDigitsRegExp: RegExp = /[0-9]{4}$/;
-const fourDigitsInRange = (input: string, min: number, max: number): boolean => {
-  const regResult = fourDigitsRegExp.exec(input);
-  if (regResult && (regResult.length > 0)) {
-    const value = parseInt(regResult[0], 10);
-
-    return valueInRange(value, min, max);
-  }
-  return false;
-};
-
-const digitsBeforeCMOrIN: RegExp = /([0-9]+)(cm|in)/;
-const units = ['cm', 'in'];
-const unitsConstraints: { min: number, max: number }[] = [
-  {
-    min: 150,
-    max: 193
-  },
-  {
-    min: 59,
-    max: 76
-  }
-];
-
-const isValidHeight = (input: string): boolean => {
-  const regResult = digitsBeforeCMOrIN.exec(input);
-  if (regResult && (regResult.length > 2)) {
-    const value = parseInt(regResult[1], 10);
-    const valueUnit = regResult[2];
-
-    const valueUnitIndex = units.indexOf(valueUnit);
-    const unitConstraints = unitsConstraints[valueUnitIndex];
-
-    return valueInRange(value, unitConstraints.min, unitConstraints.max);
-  }
-  return false;
-}
-
-const hexDecimalColorCodeRegEx: RegExp = /#[0-9a-f]{6}$/;
-const isValidHexdecimalColor = (input: string): boolean => {
-  const regResult = hexDecimalColorCodeRegEx.exec(input);
-
-  if (regResult) {
-    if (regResult[0].length !== 7)
-      throw new Error(`Not exact # and six alfanum characters: [${input}]`);
-
-    return (regResult.length > 0);
-  }
-  return false;
-};
-
-const eyeColors = ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth'];
-const isValidEyeColor = (input: string) => {
-  return eyeColors.indexOf(input) >= 0;
-};
-
-const nineDigitWithLeadingZeroRegex: RegExp = /[0-9]{9}$/;
-const isExactNineDigitWithLeadingZero = (input: string) => {
-  const regResult = nineDigitWithLeadingZeroRegex.exec(input);
-
-  if (regResult) {
-    if (regResult[0].length !== 9)
-      throw new Error(`Not exact nine digit: [${input}]`);
-    return (regResult.length > 0);
-  }
-  return false;
-}
-
-const requiredFields: string[] = ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid'];
-const requiredFieldsValidators: { (input: string): boolean }[] = [
-  (input: string): boolean => fourDigitsInRange(input, 1920, 2002),
-  (input: string): boolean => fourDigitsInRange(input, 2010, 2020),
-  (input: string): boolean => fourDigitsInRange(input, 2020, 2030),
-  isValidHeight,
-  isValidHexdecimalColor,
-  isValidEyeColor,
-  isExactNineDigitWithLeadingZero
-];
 
 export const getPassportsLines = (input: string): string[][] => {
   const inputLines = input
@@ -112,44 +29,176 @@ export const getPassportsLines = (input: string): string[][] => {
 
 export const createPassportFieldsLine = (passportLines: string[]): string => {
   return passportLines.join(' ');
-};
+}
 
 export const passportHasRequiredFields = (passportFieldsLine: string): boolean => {
   //Check if the part with colon is present in passportParts, which is 1 line with all the passportparts
   return requiredFields.filter(reqPart => passportFieldsLine.indexOf(`${reqPart}:`) < 0).length === 0;
 }
 
-export const passportFieldsAreValid = (passportFieldsLine: string): boolean => {
-  return passportFieldsLine
+export const passportFieldsAreValid = (passportWithRequiredFields: string): boolean => {
+  const fieldsWithValue = passportWithRequiredFields
     .split(' ')
     .map(getFieldWithValue)
-    .filter(isRequiredField)
-    .filter(requiredFieldHasInvalidValue)
-    .length === 0;
-}
+    .filter(isRequiredField);
 
-export const getFieldWithValue = (rawFieldWithValue: string): FieldWithValue => {
-  const regexResult = getFieldWithValueRegExp.exec(rawFieldWithValue);
-
-  if (regexResult && (regexResult.length > 2)) {
-    return {
-      field: regexResult[1].trim(),
-      value: regexResult[2].trim()
-    }
-  }
-  throw new Error(`Argument rawFieldWithValue has invalid syntax: [${rawFieldWithValue}]`);
+  const allFieldsAreValidValue = DoAllFieldsHaveValidValue(fieldsWithValue);
+  return allFieldsAreValidValue;
 };
 
-export const isRequiredField = (fieldWithValue: FieldWithValue): boolean => {
+const getFieldWithValueRegExp = /(.*):(.*)/;
+export const getFieldWithValue = (rawFieldWithValue: string): FieldWithValue => {
+  const regRes = getFieldWithValueRegExp.exec(rawFieldWithValue);
+
+  if (regRes && (regRes.length > 2)) {
+    return {
+      field: regRes[1].trim(),
+      value: regRes[2].trim()
+    }
+  }
+  throw new Error(`Argument rawFieldWithValue invalid syntax: [${rawFieldWithValue}]`);
+}
+
+export const isRequiredField = (fieldWithValue: FieldWithValue) => {
   return requiredFields.indexOf(fieldWithValue.field) >= 0;
 }
 
-export const requiredFieldHasInvalidValue = (fieldWithValue: FieldWithValue): boolean => {
+export const DoAllFieldsHaveValidValue = (fieldsWithValue: FieldWithValue[]): boolean => {
+  //Filter out valid fields, if no fields remain then all fields are valid
+  return fieldsWithValue
+    .filter(fieldWithValue => !fieldHasValidValue(fieldWithValue))
+    .length === 0;
+}
+
+export const fieldHasValidValue = (fieldWithValue: FieldWithValue): boolean => {
   const { field, value } = fieldWithValue;
 
   const fieldIndex = requiredFields.indexOf(field);
-  const validator = requiredFieldsValidators[fieldIndex];
 
-  const validatorRes = validator(value);
-  return (validatorRes === false);
+  if (fieldIndex < fieldValidators.length) {
+    const fieldValidator = fieldValidators[fieldIndex];
+    return fieldValidator(value);
+  }
+  return true;
 }
+
+const fourDigitsRegExp = /^[0-9]{4}$/;
+const getFourDigits = (input: string): number => {
+  const regRes = fourDigitsRegExp.exec(input);
+  if (regRes && (regRes.length > 0)) {
+    return parseInt(regRes[0].trim(), 10);
+  }
+  throw new Error(`No four digits found for input [${input}]`);
+}
+
+const valueInRange = (value: number, min: number, max: number): boolean => {
+  return (value >= min) && (value <= max);
+}
+
+const fourDigitsInRange = (value: string, min: number, max: number): boolean => {
+  try {
+    const fourDigits = getFourDigits(value);
+    return valueInRange(fourDigits, min, max);
+  } catch (err) {
+    return false;
+  }
+}
+
+const validateBirthYear = (input: string): boolean => fourDigitsInRange(input, 1920, 2002);
+const validateIssueYear = (input: string): boolean => fourDigitsInRange(input, 2010, 2020);
+const validateExpirationYear = (input: string): boolean => fourDigitsInRange(input, 2020, 2030);
+
+const getHeightInfoRegExp: RegExp = /^([0-9]+)(cm|in)$/;
+const getHeightInfo = (input: string): { value: number, unit: string } => {
+  const regRes = getHeightInfoRegExp.exec(input);
+
+  if (regRes && (regRes.length > 2)) {
+    return {
+      value: parseInt(regRes[1].trim(), 10),
+      unit: regRes[2].trim()
+    }
+  }
+  throw new Error(`No height data found: [${input}]`);
+};
+
+const heightPerUnitConstraints = {
+  'cm': { min: 150, max: 193 },
+  'in': { min: 59, max: 76 }
+};
+const heightInRange = (height: number, unit: string): boolean => {
+  let constraints = { min: -1, max: -1 };
+
+  if (unit === 'cm') {
+    constraints = heightPerUnitConstraints.cm;
+  }
+  else if (unit === 'in') {
+    constraints = heightPerUnitConstraints.in;
+  }
+  else {
+    throw new Error(`No unit constraints found for: [${unit}]`)
+  }
+
+  return valueInRange(height, constraints.min, constraints.max);
+};
+
+const validateHeight = (input: string): boolean => {
+  try {
+    const heightInfo = getHeightInfo(input);
+    return heightInRange(heightInfo.value, heightInfo.unit);
+  } catch (err) {
+    return false;
+  }
+};
+
+const getHairColorInfoRegExp: RegExp = /^#[0-9a-f]{6}$/;
+const getHairColorInfo = (value: string): string => {
+  const regRes = getHairColorInfoRegExp.exec(value);
+  if (regRes && (regRes.length > 0)) {
+    return regRes[0].trim();
+  }
+  throw new Error(`No hair color info found in: [${value}]`);
+}
+const validateHairColor = (input: string): boolean => {
+  try {
+    const hairColor = getHairColorInfo(input);
+    //#-sign with 6 characters
+    return hairColor.length === 7;
+  } catch (err) {
+    return false;
+  }
+};
+
+const validEyeColors: string[] = ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth'];
+const validateEyeColor = (input: string): boolean => {
+  return (validEyeColors.indexOf(input) >= 0);
+};
+
+const getPassportIdRegExp: RegExp = /^[0-9]{9}$/;
+const getPassportId = (value: string): string => {
+  const regRes = getPassportIdRegExp.exec(value);
+
+  if (regRes && (regRes.length > 0)) {
+    return regRes[0].trim();
+  }
+  throw new Error(`No passport id found for value: [${value}]`);
+};
+const validatePassportId = (input: string): boolean => {
+  try {
+    const passportId = getPassportId(input);
+    //Exact 9 characters
+    return passportId.length === 9;
+  } catch (err) {
+    return false;
+  }
+}
+
+// ['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid'];
+const fieldValidators: ({ (input: string): boolean })[] = [
+  validateBirthYear,
+  validateIssueYear,
+  validateExpirationYear,
+  validateHeight,
+  validateHairColor,
+  validateEyeColor,
+  validatePassportId
+];
