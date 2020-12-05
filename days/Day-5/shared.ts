@@ -5,14 +5,22 @@ export const getBoardingPasses = (input: string): string[] => {
     .filter(line => line);
 };
 
-export const getSeatId = (boardingPass: string): number => {
+export type SeatInfo = {
+  RowNumber: number,
+  ColumnNumber: number
+};
+
+export const getSeatInfo = (boardingPass: string): SeatInfo => {
   const rowPartition = boardingPass.substring(0, 7);
   const columnPartition = boardingPass.substring(7, boardingPass.length);
 
   const rowNumber = getDecimalFromBinaryPartition(rowPartition, 'F', 'B');
   const columnNumber = getDecimalFromBinaryPartition(columnPartition, 'L', 'R');
 
-  return (rowNumber * 8) + columnNumber;
+  return {
+    RowNumber: rowNumber,
+    ColumnNumber: columnNumber
+  };
 };
 
 export const getDecimalFromBinaryPartition = (partition: string, lowerHalfChar: string, upperHalfChar: string): number => {
@@ -42,4 +50,9 @@ export const getDecimalFromBinaryPartition = (partition: string, lowerHalfChar: 
   };
 
   return values[0];
-}
+};
+
+export const getSeatId = (seatInfo: SeatInfo): number => {
+  const { RowNumber, ColumnNumber } = seatInfo;
+  return (RowNumber * 8) + ColumnNumber;
+};
