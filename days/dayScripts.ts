@@ -25,6 +25,7 @@ import { scripts as day6 } from "./Day-6/mod.ts";
 import { scripts as day7 } from "./Day-7/mod.ts";
 import { scripts as day8 } from "./Day-8/mod.ts";
 import { scripts as day9 } from "./Day-9/mod.ts";
+import { scripts as day10 } from "./Day-10/mod.ts";
 
 scriptsPerDayNumber.set(1, day1);
 scriptsPerDayNumber.set(2, day2);
@@ -35,3 +36,4 @@ scriptsPerDayNumber.set(6, day6);
 scriptsPerDayNumber.set(7, day7);
 scriptsPerDayNumber.set(8, day8);
 scriptsPerDayNumber.set(9, day9);
+scriptsPerDayNumber.set(10, day10);
