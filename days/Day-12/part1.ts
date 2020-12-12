@@ -10,8 +10,6 @@ import {
   applyInstructionOverPosition
 } from "./shared.ts";
 
-type NavigationInstructionAction = (pos: NavigationPosition, value: number) => NavigationPosition;
-
 export type NavigationPosition = BaseNavigationPosition & {
   Facing: FacingPosition
 };

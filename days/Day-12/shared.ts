@@ -51,6 +51,11 @@ export const calculateManhattanDistance = (pos: BaseNavigationPosition): number 
   return Math.abs(pos.Vertical) + Math.abs(pos.Horizontal);
 }
 
+export const copyBasePosition = (pos: BaseNavigationPosition): BaseNavigationPosition => ({
+  Horizontal: pos.Horizontal,
+  Vertical: pos.Vertical
+});
+
 export function createNavigationInstructionActions<T>(actions: T[]): Map<string, T> {
   return new Map<string, T>(
     [
