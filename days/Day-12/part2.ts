@@ -99,6 +99,7 @@ const ActionRight = (pos: NavigationPosition, angle: number): NavigationPosition
       }, // CW 270-degree | ACW 90-degree
     ];
 
+    // Angle is anti clock-wise (ACW), so reverse transformations order
     if (angle < 0) transformations.reverse();
 
     transformations = [
