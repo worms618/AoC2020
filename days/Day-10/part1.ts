@@ -12,7 +12,6 @@ export const executor: DayScriptExecutor = (input: string): string => {
   ]);
   getJoltageDifferences(joltageRatings, possibleDiffsAmount);
 
-  console.log(possibleDiffsAmount);
   const joltageDifferencesToUse = [1,3];
   const amountJoltageDifferences = joltageDifferencesToUse.map(diff => possibleDiffsAmount.get(diff)).filter(amount => amount !== undefined);
   
