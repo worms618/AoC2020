@@ -13,9 +13,16 @@ export const executor: DayScriptExecutor = (input: string): string => {
 const isMultipleOf = (value: number, base: number) => (value % base) === 0;
 
 const bruteForce = (buses: (number | undefined)[]): number => {
+  const maxValue = buses.reduce((curValue: number | undefined, bus: number | undefined) => {
+    if ((curValue === undefined) && (bus !== undefined)) return bus;
+    if ((curValue !== undefined) && (bus !== undefined)) return curValue * bus;
+    return curValue;
+  })
   let earliestTimestamp = 100000000000000;
-
-  while (earliestTimestamp < Number.MAX_SAFE_INTEGER) {
+  
+  if (maxValue === undefined) return -1;
+  
+  while (earliestTimestamp < maxValue) {
     let isCorrectSequence = true;
 
     for (let i = 0; i < buses.length; i++) {
