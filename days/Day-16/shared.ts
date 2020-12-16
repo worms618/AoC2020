@@ -14,10 +14,23 @@ export type ForeignTicket = {
   Values: number[]
 }
 
-type ForeignTrainStationNotes = {
+export type ForeignTrainStationNotes = {
   TicketFields: ForeignTicketField[],
   YourTicket: ForeignTicket,
   NearbyTickets: ForeignTicket[]
+}
+
+export const ticketIsValid = (ticket: ForeignTicket, foreignTicketFields: ForeignTicketField[]): boolean => {
+  // Filter OUT the valid value's of the ticket 
+  // So collection contains invalid values
+  return ticket.Values.filter((value) => {
+    for (const foreignTicketField of foreignTicketFields) {
+      if (valueInRanges(value, foreignTicketField.ValueRanges))
+        return false;
+    }
+
+    return true;
+  }).length === 0;
 }
 
 export const valueInRanges = (value: number, valueRanges: ForeignTicketFieldValueRange[]): boolean => {
@@ -44,7 +57,7 @@ export const getNotesFromInput = (input: string): ForeignTrainStationNotes => {
 
   const inputLines = getInputLinesTrimAndFilterEmpty(input);
 
-  const getTicketFieldRegExp = /([A-Za-z]+):\s*(\d+)-(\d+)\s*or*\s*(\d+)-(\d+)/
+  const getTicketFieldRegExp = /(.*):\s*(\d+)-(\d+)\s*or*\s*(\d+)-(\d+)/
 
   const getTicketFieldProcessor = (OnGetTicketField: { (field: ForeignTicketField): void }): { (line: string): void } => (line: string): void => {
     const regRes = getTicketFieldRegExp.exec(line);

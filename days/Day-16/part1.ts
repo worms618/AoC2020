@@ -5,7 +5,6 @@ import { ForeignTicket, ForeignTicketField, getNotesFromInput, valueInRanges } f
 export const executor: DayScriptExecutor = (input: string): string => {
   const notes = getNotesFromInput(input);
 
-
   const { TicketFields, NearbyTickets } = notes;
 
   const invalidTicketValues: number[] = NearbyTickets
