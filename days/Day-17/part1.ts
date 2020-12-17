@@ -8,7 +8,7 @@ class Cube3D {
   }
 
   toString() {
-    return `${this.x}-${this.y}-${this.z}`;
+    return `${this.x},${this.y},${this.z}`;
   }
 
   translate(x: number, y: number, z: number) {
@@ -41,20 +41,22 @@ export const executor: DayScriptExecutor = (input: string): string => {
     cubeStates = runCycle(startDimension, endDimension, cubeStates);
   }
 
+  console.log(cubeStates)
+
   return `Total amount of active cubes are ${totalCycles} cycles: ${Array.from(cubeStates.values())
-    .reduce((totalTrue, value) => value ? ++totalTrue : totalTrue, 0)}`
+    .reduce((totalTrue, value) => value ? totalTrue++ : totalTrue, 0)}`
 };
 
 const runCycle = (start: Cube3D, end: Cube3D, states: Map<string, boolean>): Map<string, boolean> => {
   const newStates = new Map<string, boolean>();
   start.translate(-1, -1, -1);
-  end.translate(-1, -1, -1);
+  end.translate(1, 1, 1);
 
   for (let z = start.z; z < end.z; z++) {
     for (let y = start.y; y < end.y; y++) {
       for (let x = start.x; x < end.x; x++) {
         const currentCube = new Cube3D(x, y, z);
-        if (newStates.has(currentCube.toString()))
+        if (!newStates.has(currentCube.toString()))
           newStates.set(currentCube.toString(), false);
 
         let currentCubeState = false;
@@ -90,17 +92,21 @@ const getTotalActiveNeighbours = (cube: Cube3D, start: Cube3D, end: Cube3D, stat
   for (let z = minRelative; z < maxRelative; z++) {
     for (let y = minRelative; y < maxRelative; y++) {
       for (let x = minRelative; x < maxRelative; x++) {
-        const neighbourCube = new Cube3D(cube.x, cube.y, cube.z);
-        neighbourCube.translate(x, y, z);
-
-        if (!states.has(neighbourCube.toString())) continue;
-
-        // In x range
-        if ((neighbourCube.x < start.x) || (neighbourCube.x > end.x)) continue;
-        // In y range
-        if ((neighbourCube.y < start.y) || (neighbourCube.y > end.y)) continue;
-        // In z range
-        if ((neighbourCube.z < start.z) || (neighbourCube.z > end.z)) continue;
+        if ((x !== 0) || (y !== 0) || (z !== 0)) {
+          const neighbourCube = new Cube3D(cube.x + x, cube.y + y, cube.z + z);
+  
+          if (!states.has(neighbourCube.toString())) continue;
+  
+          // In x range
+          if ((neighbourCube.x < start.x) || (neighbourCube.x > end.x)) continue;
+          // In y range
+          if ((neighbourCube.y < start.y) || (neighbourCube.y > end.y)) continue;
+          // In z range
+          if ((neighbourCube.z < start.z) || (neighbourCube.z > end.z)) continue;
+  
+          const neighbourCubeState = states.get(neighbourCube.toString());
+          if(neighbourCubeState) totalActive++;
+        }
       }
     }
   }
