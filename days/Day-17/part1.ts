@@ -2,115 +2,127 @@ import { DayScriptExecutor } from "../../src/day/day.types.ts";
 
 import { getInputLinesTrimAndFilterEmpty } from "../shared.ts";
 
-class Cube3D {
-  constructor(public x: number, public y: number, public z: number) {
+interface ICube3D {
+  x: number,
+  y: number,
+  z: number
+};
 
-  }
+const Cube3D = (x: number = 0, y: number = 0, z: number = 0): ICube3D => ({
+  x, y, z
+});
 
-  toString() {
-    return `${this.x},${this.y},${this.z}`;
-  }
+const cubeHash = (cube: ICube3D): string => `${cube.x},${cube.y},${cube.z}`;
 
-  translate(x: number, y: number, z: number) {
-    this.x += x;
-    this.y += y;
-    this.z += z;
-  }
-}
+const cubeTranslate = (cube: ICube3D, x: number, y: number, z: number) => {
+  cube.x += x;
+  cube.y += y;
+  cube.z += z;
+  return cube;
+};
 
 export const executor: DayScriptExecutor = (input: string): string => {
-  let cubeStates = new Map<string, boolean>();
-  let startDimension = new Cube3D(0, 0, 0);
-  let endDimension = new Cube3D(0, 0, 0);
+  let allStates: Map<string, boolean> = new Map<string, boolean>();
+  let start = Cube3D(0, 0, 0);
+  let end = Cube3D(0, 0, 0);
 
   getInputLinesTrimAndFilterEmpty(input)
-    .forEach((line, row, allRows) => line
-      .split('')
-      .forEach((stateSym, column, allColumns) => {
-        cubeStates.set(new Cube3D(column, row, 0).toString(), stateSym === '#');
+    .map((line, y, allInRow) => Array.from(line).map((char, x, allInColumn) => {
+      allStates.set(cubeHash(Cube3D(x, y, 0)), char === '#');
 
-        if ((row === (allRows.length - 1)) && (column === (allColumns.length - 1))) {
-          endDimension = new Cube3D(column, row, 0);
-        }
-      })
-    );
+      if (((allInRow.length - 1) === y) && (allInColumn.length - 1) === x)
+        end = Cube3D(x, y, 0);
+    }));
 
-  const totalCycles = 1;
+  const amountOfCycles = 6;
 
-  for (let i = 0; i < totalCycles; i++) {
-    cubeStates = runCycle(startDimension, endDimension, cubeStates);
+  for (let i = 0; i < amountOfCycles; i++) {
+    start = cubeTranslate(start, -1, -1, -1);
+    end = cubeTranslate(end, 1, 1, 1);
+
+    allStates = runCycle(start, end, allStates);
   }
 
-  console.log(cubeStates)
+  let totalCubesLeftActive = 0;
+  for (const state of allStates.values()) {
+    if (state) totalCubesLeftActive++;
+  }
 
-  return `Total amount of active cubes are ${totalCycles} cycles: ${Array.from(cubeStates.values())
-    .reduce((totalTrue, value) => value ? totalTrue++ : totalTrue, 0)}`
+  return `After ${amountOfCycles} cycles are ${totalCubesLeftActive} left active`;
 };
 
-const runCycle = (start: Cube3D, end: Cube3D, states: Map<string, boolean>): Map<string, boolean> => {
-  const newStates = new Map<string, boolean>();
-  start.translate(-1, -1, -1);
-  end.translate(1, 1, 1);
+const runCycle = (start: ICube3D, end: ICube3D, states: Map<string, boolean>): Map<string, boolean> => {
+  const cycleStates = new Map<string, boolean>();
 
-  for (let z = start.z; z < end.z; z++) {
-    for (let y = start.y; y < end.y; y++) {
-      for (let x = start.x; x < end.x; x++) {
-        const currentCube = new Cube3D(x, y, z);
-        if (!newStates.has(currentCube.toString()))
-          newStates.set(currentCube.toString(), false);
+  for (let x = start.x; x <= end.x; x++) {
+    for (let y = start.y; y <= end.y; y++) {
+      for (let z = start.z; z <= end.z; z++) {
+        const currCube = Cube3D(x, y, z);
+        const currHashCube = cubeHash(currCube);
+        let currCubeState = false;
 
-        let currentCubeState = false;
-        if (states.has(currentCube.toString())) {
-          const currentCubeExistingState = states.get(currentCube.toString());
-          if (currentCubeExistingState) currentCubeState = currentCubeExistingState;
+        if (!cycleStates.has(currHashCube)) {
+          cycleStates.set(currHashCube, currCubeState);
         }
 
-        const totalActiveNeighbours = getTotalActiveNeighbours(currentCube, start, end, states);
-        if (currentCubeState) {
-          // If a cube is active and exactly 2 or 3 of its neighbors are also active, the cube remains active. Otherwise, the cube becomes inactive.
-          newStates.set(currentCube.toString(),
-            (totalActiveNeighbours === 2) || (totalActiveNeighbours === 3)
-          );
+        const currCubeStateExisting = states.get(currHashCube);
+        if (currCubeStateExisting)
+          currCubeState = currCubeStateExisting;
+        else
+          currCubeState = false;
+
+        const neighbourStates = getNeighbourStates(currCube, start, end, states);
+        // Filter true values and count amount left
+        const totalActiveNeighbours = neighbourStates.filter(state => state).length;
+
+        if (currCubeState) {
+          const twoOrThreeNeighboursAreActive = (totalActiveNeighbours === 2) || (totalActiveNeighbours === 3);
+          cycleStates.set(currHashCube, twoOrThreeNeighboursAreActive);
         } else {
-          // If a cube is inactive but exactly 3 of its neighbors are active, the cube becomes active. Otherwise, the cube remains inactive.
-          newStates.set(currentCube.toString(),
-            (totalActiveNeighbours === 3)
-          );
+          const threeNeightboursAreActive = (totalActiveNeighbours === 3);
+          cycleStates.set(currHashCube, threeNeightboursAreActive);
         }
       }
     }
   }
 
-  return newStates;
+  return cycleStates;
 };
 
-const getTotalActiveNeighbours = (cube: Cube3D, start: Cube3D, end: Cube3D, states: Map<string, boolean>): number => {
-  let totalActive = 0;
-  const minRelative = -1;
-  const maxRelative = 2;
+const getNeighbourStates = (cube: ICube3D, start: ICube3D, end: ICube3D, states: Map<string, boolean>): boolean[] => {
+  const neighborStates: boolean[] = [];
 
-  for (let z = minRelative; z < maxRelative; z++) {
-    for (let y = minRelative; y < maxRelative; y++) {
-      for (let x = minRelative; x < maxRelative; x++) {
-        if ((x !== 0) || (y !== 0) || (z !== 0)) {
-          const neighbourCube = new Cube3D(cube.x + x, cube.y + y, cube.z + z);
-  
-          if (!states.has(neighbourCube.toString())) continue;
-  
-          // In x range
-          if ((neighbourCube.x < start.x) || (neighbourCube.x > end.x)) continue;
-          // In y range
-          if ((neighbourCube.y < start.y) || (neighbourCube.y > end.y)) continue;
-          // In z range
-          if ((neighbourCube.z < start.z) || (neighbourCube.z > end.z)) continue;
-  
-          const neighbourCubeState = states.get(neighbourCube.toString());
-          if(neighbourCubeState) totalActive++;
+  // -1, 0, 1
+  for (let x = -1; x < 2; x++) {
+    for (let y = -1; y < 2; y++) {
+      for (let z = -1; z < 2; z++) {
+        const neighbourCube = Cube3D(x + cube.x, y + cube.y, z + cube.z);
+        const neighbourHashCube = cubeHash(neighbourCube);
+
+        if (states.has(neighbourHashCube)) {
+          const neighbourExistingState = states.get(neighbourHashCube);
+
+          if (neighbourExistingState !== undefined)
+            neighborStates.push(neighbourExistingState)
+          else
+            throw new Error(`States has ${neighbourHashCube} but value after get is undefined`);
+        } else {
+          const neighbourCubeInRange = cubeInRange(neighbourCube, start, end);
+
+          if (neighbourCubeInRange)
+            neighborStates.push(false);
         }
       }
     }
   }
 
+  return neighborStates;
+};
 
-  return totalActive;
+const cubeInRange = (cube: ICube3D, min: ICube3D, max: ICube3D): boolean => {
+  const { x, y, z } = cube;
+
+  return ((x >= min.x) && (x <= max.x)) &&
+    ((y >= min.y) && (y <= max.y)) &&
+    ((z >= min.z) && (z <= max.z))
 };
