@@ -1,1 +1,1 @@
-deno run --allow-read --allow-write .\scripts\runDay.ts 18 2
+deno run --allow-read --allow-write .\scripts\runDay.ts 19 1
