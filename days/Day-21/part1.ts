@@ -44,14 +44,10 @@ export const executor: DayScriptExecutor = (input: string): string => {
     }
   });
 
-  console.log(allergensInIngredients)
-
   const ingredientsWithAllergen: Set<string> = new Set<string>();
   for (const ingredients of allergensInIngredients.values()) {
     ingredients.forEach(ingredient => ingredientsWithAllergen.add(ingredient));
   }
-
-  console.log(ingredientsWithAllergen)
 
   let total = ingredientsPerLine.reduce((total, ingredients) => {
     return total + (ingredients.filter(ingredient => !ingredientsWithAllergen.has(ingredient)).length);
